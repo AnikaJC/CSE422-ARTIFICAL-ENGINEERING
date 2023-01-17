@@ -1,0 +1,75 @@
+import math
+
+maxEval = 0
+minEval = 0
+evaluation = []
+branch = 0
+count = 0
+
+def minimax(position, depth, alpha, beta, maximizingPlayer):  
+    global count  
+    global maxEval
+    global minEval
+    if depth == 0:
+        count += 1
+        return evaluation[position]  
+    if maximizingPlayer:  
+        maxEval = -math.inf  
+        for child in range(branch*position+1, branch*position+4):  
+            eval = minimax(child, depth-1, alpha, beta, False)  
+            maxEval = max(maxEval, eval)
+            alpha = max(alpha, eval)  
+            if beta <= alpha:  
+                break
+            evaluation[position] = alpha  
+        return maxEval  
+    else:
+        minEval = math.inf  
+        for child in range(branch*position+1, branch*position+4):  
+            eval = minimax(child, depth-1, alpha, beta, True)  
+            minEval = min(minEval, eval)
+            beta = min(beta, eval) 
+            if beta <= alpha: 
+                break
+            evaluation[position] = beta  
+        return minEval  
+
+def max(a, b):  
+    if a > b:
+        return a
+    else:
+        return b
+
+def min(a, b):  
+    if a < b:
+        return a
+    else:
+        return b
+
+turn = int(input('#turns for Riyad: '))
+depth = 2*turn
+branch = int(input('#branches per each node : '))
+leafNodes = int(math.pow(branch, depth))  
+nodes = 1
+for i in range(depth):
+    nodes += int(math.pow(branch, i+1))  
+evaluation = [None] * nodes  
+a = input('range of notes: ').split(" ")  
+a[0] = int(a[0])
+a[1] = int(a[1])
+
+evaluation = [0, 0, 0, 0, 3, 12, 8, 2, 4, 6, 14, 5, 2]
+minimax(0, depth, -math.inf, math.inf, True)  
+
+print(evaluation)
+print(minEval)
+print(maxEval)
+print("Depth: ", depth)
+print("Branch: ", branch)
+print("Terminal states (Leaf nodes): ", leafNodes)
+print("Maximum Amount: ", evaluation[0])
+print("Comparisons before: ", leafNodes)
+print("comparisons after: ", count)
+
+
+

@@ -1,0 +1,120 @@
+1.
+def bfs(start,end,graph,nodes,edges):
+   sums=[]
+   visited=[False for i in range(nodes)]
+   cost=[0 for i in range(nodes)]
+   sums.append(start)
+
+   while sums:
+       start=sums[0]
+       if start == end:
+           return cost[start]
+           
+       else:
+           visited[sums.pop(0)] = True
+           for i in range(len(graph[start])):
+               if not visited[graph[start][i]]:
+                   sums.append(graph[start][i])
+                   visited[graph[start][i]]=True
+                   cost[graph[start][i]]=cost[start]+1
+
+if __name__ == '__main__':
+   f = open("bfs1.txt")
+   nodes = int(f.readline())
+   edges = int(f.readline())
+   graph = [[] for i in range(nodes)]
+
+   for i in range(edges):
+       u, v = map(int, f.readline().split())
+       graph[u].append(v)
+       graph[v].append(u)
+   destination = int(f.readline())
+   sum=bfs(0,destination,graph,nodes,edges)
+   print("Minimum number of moves Nora needs to go to ‘x’ is",sum)
+
+2. 
+def bfs(start,end,graph,nodes,edges):
+   sums=[]
+   visited=[False for i in range(nodes)]
+   cost=[0 for i in range(nodes)]
+   sums.append(start)
+
+   while sums:
+       start=sums[0]
+       if start == end:
+           return cost[start]
+           
+       else:
+           visited[sums.pop(0)] = True
+           for i in range(len(graph[start])):
+               if not visited[graph[start][i]]:
+                   sums.append(graph[start][i])
+                   visited[graph[start][i]]=True
+                   cost[graph[start][i]]=cost[start]+1
+
+if __name__ == '__main__':
+   f = open("bfs2.txt")
+   nodes = int(f.readline())
+   edges = int(f.readline())
+   graph = [[] for i in range(nodes)]
+
+   for i in range(edges):
+       u, v = map(int, f.readline().split())
+       graph[u].append(v)
+       graph[v].append(u)
+
+   destination = int(f.readline())
+   n=int(f.readline())
+   l=int(f.readline())
+   noras=bfs(n, destination, graph, nodes, edges)
+   laras=bfs(l, destination, graph, nodes, edges)
+
+   
+   if laras == noras :
+       print("Its a tie")
+   elif laras>noras:
+       print("Nora Wins")
+   else:
+       print("Lara Wins")
+
+
+3.
+def bfs(pos, destinations, graph, nodes, edges):
+   sums = []
+   visited = [False for i in range(nodes)]
+   cost = [0 for i in range(nodes)]
+   sums.append(pos)
+
+   while sums:
+       pos = sums[0]
+       if pos in destinations:
+           print("K{} wins".format(pos))
+           return cost[pos] 
+       else:
+           visited[sums.pop(0)] = True
+           for i in range(len(graph[pos])):
+               if not visited[graph[pos][i]] :
+                   sums.append(graph[pos][i])
+                   visited[graph[pos][i]] = True
+                   cost[graph[pos][i]] = cost[pos] + 1
+
+if __name__ == '__main__':
+   f = open("bfs3.txt")
+   nodes = int(f.readline())
+   edges = int(f.readline())
+   graph = [[] for i in range(nodes)]
+   for i in range(edges):
+       u, v = map(int, f.readline().split())
+       graph[v].append(u)
+
+   lina = int(f.readline()) 
+   destinations=[] 
+   participants=int(f.readline())
+   for i in range(participants):
+       destinations.append(int(f.readline()))
+
+   steps=bfs(lina, destinations, graph, nodes, edges)
+   print("Number of steps needed is ",steps)
+
+
+

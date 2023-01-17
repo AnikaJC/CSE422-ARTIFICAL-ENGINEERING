@@ -1,0 +1,246 @@
+# ***Sklearn Lab***
+# **Loading Dataset as Dataframe using Pandas**
+
+import pandas as pd
+import numpy as np
+import sklearn
+
+volunteer = pd.read_csv('./heart disease classification dataset.csv')
+vol=pd.read_csv('./heart disease classification dataset.csv')
+volunteer.head()
+
+# **Handling missing values**
+
+volunteer.shape
+
+volunteer.isnull().sum()
+
+volunteer=volunteer.dropna(axis=0,subset=['chol'])
+volunteer.shape
+
+from sklearn.impute import SimpleImputer
+
+impute = SimpleImputer(missing_values=np.nan, strategy='mean')
+
+impute.fit(volunteer[['trestbps']])
+
+volunteer['trestbps'] = impute.transform(volunteer[['trestbps']])
+
+
+from sklearn.impute import SimpleImputer
+
+impute = SimpleImputer(missing_values=np.nan, strategy='mean')
+
+impute.fit(volunteer[['thalach']])
+
+volunteer['thalach'] = impute.transform(volunteer[['thalach']])
+
+volunteer.isnull().sum()
+
+# **Encoding Categorical Features**
+volunteer.info()
+
+volunteer['sex'].unique()
+
+from sklearn.preprocessing import LabelEncoder
+
+enc=LabelEncoder()
+
+volunteer['sex']=enc.fit_transform(volunteer['sex'])
+
+print(volunteer[['sex']].head())
+
+volunteer['target'].unique()
+
+from sklearn.preprocessing import LabelEncoder
+
+enc=LabelEncoder()
+
+volunteer['target']=enc.fit_transform(volunteer['target'])
+
+print(volunteer[['target']].head())
+
+# **Scaling**
+
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
+
+scale=MinMaxScaler()
+scale.fit(volunteer)
+
+volunteer=scale.transform(volunteer)
+
+volunteer=pd.DataFrame(volunteer)
+volunteer
+
+print(volunteer.min(axis=0))
+print(volunteer.max(axis=0))
+
+# **Splitting**
+volunteers=volunteer.drop(0,axis=1)
+
+
+X=volunteers.drop(14,axis=1)
+X
+
+Y=volunteers[14]
+Y
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y,test_size=0.2, random_state=1)
+
+X_train.shape
+
+X_test.shape
+
+# ***Training and Testing***
+
+!python -m pip show scikit-learn
+
+# **Random Forest Classifier**
+
+from sklearn.ensemble import RandomForestClassifier
+rfc=RandomForestClassifier(n_estimators=50)
+rfc.fit(X_train,Y_train)
+
+print("Pre PCAAccuracy of Training {:.2f}".format(rfc.score(X_train, Y_train)))
+print("Pre PCAAccuracy of Testing {:.2f}".format(rfc.score(X_test, Y_test)))
+
+preRFC_train=round(rfc.score(X_train, Y_train),2)*100
+preRFC_test=round(rfc.score(X_test, Y_test),2)*100
+
+predictions = rfc.predict(X_test)
+
+from sklearn.metrics import confusion_matrix
+cm=confusion_matrix(predictions, Y_test)
+print(cm)
+
+
+from seaborn import heatmap
+heatmap(cm , cmap="Pastel1_r", xticklabels=['class_0' ,'class_1'], yticklabels=['class_0' ,'class_1'], annot=True)
+
+# **Neural Network (MLP) Classifier**
+
+from sklearn.neural_network import MLPClassifier
+mlp=MLPClassifier(hidden_layer_sizes=(7), activation="relu", max_iter=10000)
+
+mlp.fit(X_train, Y_train)
+
+print("Pre PCA Accuracy of Training {:.2f}".format(mlp.score(X_train, Y_train)))
+print("Pre PCA Accuracy of Testing {:.2f}".format(mlp.score(X_test, Y_test)))
+
+preMLP_train = round(mlp.score(X_train, Y_train),2)*100
+preMLP_test = round(mlp.score(X_test, Y_test),2)*100
+
+predictions = mlp.predict(X_test)
+print(predictions)
+
+from sklearn.metrics import confusion_matrix
+cm=confusion_matrix(predictions, Y_test)
+print(cm)
+
+from seaborn import heatmap
+heatmap(cm , cmap="Pastel1_r", xticklabels=['class_0' ,'class_1'], yticklabels=['class_0' ,'class_1'], annot=True)
+
+# **Support Vector Machines**
+
+from sklearn.svm import SVC
+svc = SVC(random_state=0, tol=1e-5)
+svc.fit(X_train, Y_train) 
+
+print("Pre PCA Accuracy of Training {:.2f}".format(svc.score(X_train, Y_train)))
+print("Pre PCA Accuracy of Testing  {:.2f}".format(svc.score(X_test, Y_test)))
+
+preSVM_train = round(svc.score(X_train, Y_train),2)*100
+preSVM_test = round(svc.score(X_test, Y_test),2)*100
+
+predictions = svc.predict(X_test)
+print(predictions)
+
+from sklearn.metrics import confusion_matrix
+cm=confusion_matrix(predictions, Y_test)
+print(cm)
+
+from seaborn import heatmap
+heatmap(cm , cmap="Pastel1_r", xticklabels=['class_0' ,'class_1'], yticklabels=['class_0' ,'class_1'], annot=True)
+
+# **Principal Component Analysis**
+
+from sklearn.decomposition import PCA 
+pca = PCA(n_components=13)
+
+
+volunteer.shape
+
+volunteer.keys()
+
+comps= pca.fit_transform(volunteer)
+print(comps)
+
+comps.shape
+
+pca.explained_variance_ratio_
+
+sum(pca.explained_variance_ratio_)
+
+pdf = pd.DataFrame(data=comps, columns=["pc 1", "pc 2","pc 3","pc 4","pc 5","pc 6","pc 7","pc 8","pc 9","pc 10","pc 11","pc 12","pc 13" ])
+main_df=pd.concat([pdf, vol[["target"]]], axis=1)
+
+main_df=main_df.drop([302],axis=0)
+main_df.head()
+
+x=main_df.iloc[:,1:-1]
+y=  main_df.iloc[:,-1]
+x_train, x_test, y_train, y_test = train_test_split(x , y , test_size=0.2, random_state=42)
+
+y_train.dtypes
+
+# **Training and Testing with PCA**
+
+svc = SVC(kernel="linear")
+svc.fit(x_train, y_train)
+postSVM_train=round(svc.score(x_train, y_train),2)*100
+postSVM_test=round(svc.score(x_test, y_test),2)*100
+print("Post PCA Accuracy of Training{:.2f}".format(svc.score(x_train, y_train)))
+print("Post PCA Accuracy of Testing{:.2f}".format(svc.score(x_test, y_test)))
+
+rfc = RandomForestClassifier(n_estimators=100)
+rfc.fit(x_train, y_train)
+postRFC_train=round(rfc.score(x_train, y_train),2)*100
+postRFC_test=round(rfc.score(x_test, y_test),2)*100
+print("Post PCA Accuracy of Training {:.2f}".format(rfc.score(x_train, y_train)))
+print("Post PCA Accuracy of Testing {:.2f}".format(rfc.score(x_test, y_test)))
+
+mlp=MLPClassifier(hidden_layer_sizes=(7), activation="relu", max_iter=10000)
+mlp.fit(x_train, y_train)
+postMLP_train=round(mlp.score(x_train, y_train),2)*100
+postMLP_test=round(mlp.score(x_test, y_test),2)*100
+print("Post PCA Accuracy of Training {:.2f}".format(mlp.score(x_train, y_train)))
+print("Post PCA Accuracy of Testing {:.2f}".format(mlp.score(x_test, y_test)))
+
+data = [[preSVM_test, preRFC_test, preMLP_test],
+[postSVM_test, postRFC_test, postMLP_test],
+[preSVM_train, preRFC_train, preMLP_train],
+[postSVM_train, postRFC_train, postMLP_train]]
+X = np.arange(3)
+
+# **Comparison through plotting**
+
+import matplotlib.pyplot as plt
+fig = plt.figure()
+ 
+a = fig.add_axes([0,0,1,1])
+ 
+a.bar(X + 0.00, data[0], color = 'red', width = 0.20)
+a.bar(X + 0.20, data[1], color = 'green', width = 0.20)
+a.bar(X + 0.40, data[2], color = 'blue', width = 0.20)
+a.bar(X + 0.60, data[3], color = 'black', width = 0.20)
+ 
+a.legend(labels=['Pre PCA Train','Post PCA Train','Pre PCA Test', 'Post PCA Test'],loc='upper left',bbox_to_anchor=(1, 1))
+ 
+plt.ylabel('Percentage')
+plt.xlabel('SVM(left)   Random Forest   MLP(right)')
+plt.title('Visualization Analysis')
+
+

@@ -1,0 +1,92 @@
+# **Loading Dataset as Dataframe using Pandas**
+import pandas as pd
+import numpy as np
+import sklearn
+
+volunteer = pd.read_csv('./heart disease classification dataset.csv')
+volunteer.head()
+
+# **Handling missing values**
+
+volunteer.shape
+
+volunteer.isnull().sum()
+
+volunteer=volunteer.dropna(axis=0,subset=['chol'])
+volunteer.shape
+
+from sklearn.impute import SimpleImputer
+
+impute = SimpleImputer(missing_values=np.nan, strategy='mean')
+
+impute.fit(volunteer[['trestbps']])
+
+volunteer['trestbps'] = impute.transform(volunteer[['trestbps']])
+
+
+from sklearn.impute import SimpleImputer
+
+impute = SimpleImputer(missing_values=np.nan, strategy='mean')
+
+impute.fit(volunteer[['thalach']])
+
+volunteer['thalach'] = impute.transform(volunteer[['thalach']])
+
+volunteer.isnull().sum()
+
+# **Encoding Categorical Features**
+
+
+volunteer.info()
+
+volunteer['sex'].unique()
+
+from sklearn.preprocessing import LabelEncoder
+
+enc=LabelEncoder()
+
+volunteer['sex']=enc.fit_transform(volunteer['sex'])
+
+print(volunteer[['sex']].head())
+volunteer['target'].unique()
+
+from sklearn.preprocessing import LabelEncoder
+
+enc=LabelEncoder()
+
+volunteer['target']=enc.fit_transform(volunteer['target'])
+
+print(volunteer[['target']].head())
+
+# **Scaling**
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
+
+scale=MinMaxScaler()
+scale.fit(volunteer)
+
+volunteer=scale.transform(volunteer)
+
+volunteer=pd.DataFrame(volunteer)
+volunteer
+
+print(volunteer.min(axis=0))
+print(volunteer.max(axis=0))
+
+# **Splitting**
+
+volunteers=volunteer.drop(0,axis=1)
+
+X=volunteers.drop(1,axis=1)
+X
+
+Y=volunteers[1]
+Y
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y, random_state=1)
+
+X_train.shape
+
+X_test.shape
+

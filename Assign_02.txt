@@ -1,0 +1,94 @@
+import random
+import numpy as np
+	
+def mutation(c):
+    i=np.random.randint(0,queens)
+    p=np.random.randint(0,queens)
+    c[i]=p
+    return c
+
+def crossover(x,y):
+    p=np.random.randint(0,queens,dtype=int)
+    f=x[p:]
+    s=y[:p]
+    return f+s
+
+def selection(popn, popf):
+    probab = []
+    for i in range(len(popf)):
+        probab.append((popf[i] / sum(popf)))   
+    a=[0 for i in range(len(popn))]
+    for i in range(len(popn)):
+        a[i]=i
+    size=1
+    return popn[np.random.choice(a,size,True,probab)[0]]
+
+def fitness(p,q): 
+    f=[]
+    for state in p:
+        max_fit=(q*(q-1))/2
+        matrix=np.zeros(shape=(len(state),len(state)))
+        x=[]
+        y=[]
+        for i in range(len(state)): 
+            z=state[i]
+            matrix[len(state)-z-1][i]=1
+            x.append(len(state)-z)
+            y.append(i)
+        #horizontal attack pairs
+        horizon=0
+        for i in range(len(state)):   
+            row=np.sum(matrix[i],dtype=int)
+            pair=(row*(row-1))/2
+            horizon+=pair
+        #horizontal attack pairs
+        diag=0
+        for i in range(len(x)):
+            attack=0         
+            slicedX=x[i+1:]
+            slicedY=y[i+1:]
+            for j in range(len(slicedX)):
+                if(abs(x[i]-slicedX[j]) == abs(y[i]-slicedY[j])):
+                    attack= attack+1
+            diag=diag+attack
+        sum= diag + horizon
+        fit=max_fit-sum
+        # print(matrix)
+        f.append(fit)
+    return f
+
+
+if __name__ == "__main__":
+    queens = 8
+    size=10
+    rate=0.3
+    population = [[random.randint(1,queens) for i in range(queens)] for i in range(size)]
+
+    max_fit=(queens*(queens-1))/2
+    generation=0
+    total=None
+    while True:
+        generation+=1
+        new_pop = []
+        total=fitness(population,queens)
+        if generation%1000==0:
+            print("MaxFit {} Gen {}".format(max(total),generation))
+        if generation==100000 or max(total)==max_fit :
+            break
+        for i in range(len(population)):
+            x=selection(population,total)
+            y=selection(population,total)
+            child=crossover(x,y)
+            if(np.random.random()< rate):
+                child=mutation(child)
+            new_pop.append(child)
+        population=new_pop
+    
+    print("Children",population[total.index(max(total))])
+    print("SuperMaxFit {}, Gen {}".format(max(total),generation))
+
+
+
+
+
+
